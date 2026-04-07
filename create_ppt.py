@@ -1,302 +1,232 @@
 from pptx import Presentation
-from pptx.util import Inches, Pt, Emu
+from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
-from pptx.util import Inches, Pt
-import urllib.request
-import os
 
-# Colors
-NAVY       = RGBColor(0x0A, 0x1F, 0x44)   # dark navy background
-GOLD       = RGBColor(0xF5, 0xC5, 0x18)   # pirate gold
-WHITE      = RGBColor(0xFF, 0xFF, 0xFF)
-RED        = RGBColor(0xCC, 0x1F, 0x1F)
-LIGHT_BLUE = RGBColor(0xD6, 0xEA, 0xF8)
-DARK_GOLD  = RGBColor(0xB8, 0x8A, 0x00)
-ORANGE     = RGBColor(0xF3, 0x9C, 0x12)
-
-SLIDE_W = Inches(13.33)
-SLIDE_H = Inches(7.5)
+# ── Palette douce et épurée ──────────────────────────────────────
+BG          = RGBColor(0xFA, 0xF9, 0xF7)   # blanc cassé chaud
+WHITE       = RGBColor(0xFF, 0xFF, 0xFF)
+SAND        = RGBColor(0xF2, 0xEE, 0xE8)   # beige sable
+TEAL        = RGBColor(0x4A, 0x9E, 0x9E)   # vert-bleu doux
+TEAL_LIGHT  = RGBColor(0xD6, 0xED, 0xED)   # teal très clair
+CORAL       = RGBColor(0xE8, 0x7B, 0x6A)   # corail doux
+CORAL_LIGHT = RGBColor(0xF9, 0xE4, 0xE1)   # corail très clair
+DARK        = RGBColor(0x2D, 0x2D, 0x2D)   # gris foncé (texte)
+MID         = RGBColor(0x7A, 0x7A, 0x7A)   # gris moyen
+LIGHT_GREY  = RGBColor(0xEE, 0xEC, 0xE9)   # gris très clair
 
 prs = Presentation()
-prs.slide_width  = SLIDE_W
-prs.slide_height = SLIDE_H
+prs.slide_width  = Inches(13.33)
+prs.slide_height = Inches(7.5)
 
-# ─────────────────────────────────────────────
-# Helper: solid fill for a shape
-# ─────────────────────────────────────────────
 def solid(shape, color):
     shape.fill.solid()
     shape.fill.fore_color.rgb = color
 
-def no_fill(shape):
-    shape.fill.background()
-
-def add_rect(slide, l, t, w, h, color, radius=False):
-    shape = slide.shapes.add_shape(
-        1,  # MSO_SHAPE_TYPE.RECTANGLE
-        Inches(l), Inches(t), Inches(w), Inches(h)
-    )
-    solid(shape, color)
+def no_line(shape):
     shape.line.fill.background()
-    return shape
 
-def add_rounded_rect(slide, l, t, w, h, color):
-    from pptx.enum.shapes import MSO_SHAPE_TYPE
-    shape = slide.shapes.add_shape(
-        5,  # rounded rectangle
-        Inches(l), Inches(t), Inches(w), Inches(h)
-    )
-    solid(shape, color)
-    shape.line.fill.background()
-    shape.adjustments[0] = 0.05
-    return shape
+def add_rect(slide, l, t, w, h, color):
+    s = slide.shapes.add_shape(1, Inches(l), Inches(t), Inches(w), Inches(h))
+    solid(s, color)
+    no_line(s)
+    return s
 
-def tf_para(tf, text, size, bold=False, color=WHITE, align=PP_ALIGN.LEFT, italic=False):
-    p = tf.add_paragraph()
-    p.alignment = align
-    run = p.add_run()
-    run.text = text
-    run.font.size = Pt(size)
-    run.font.bold = bold
-    run.font.italic = italic
-    run.font.color.rgb = color
-    return p
+def add_rrect(slide, l, t, w, h, color, adj=0.08):
+    s = slide.shapes.add_shape(5, Inches(l), Inches(t), Inches(w), Inches(h))
+    solid(s, color)
+    no_line(s)
+    s.adjustments[0] = adj
+    return s
 
-def add_textbox(slide, l, t, w, h, text, size, bold=False, color=WHITE,
-                align=PP_ALIGN.LEFT, italic=False, wrap=True):
-    txb = slide.shapes.add_textbox(Inches(l), Inches(t), Inches(w), Inches(h))
-    txb.word_wrap = wrap
-    tf = txb.text_frame
+def tb(slide, l, t, w, h, text, size,
+       bold=False, color=DARK, align=PP_ALIGN.LEFT, italic=False, wrap=True):
+    box = slide.shapes.add_textbox(Inches(l), Inches(t), Inches(w), Inches(h))
+    box.word_wrap = wrap
+    tf = box.text_frame
     tf.word_wrap = wrap
-    # clear default empty paragraph
     p = tf.paragraphs[0]
     p.alignment = align
-    run = p.add_run()
-    run.text = text
-    run.font.size = Pt(size)
-    run.font.bold = bold
-    run.font.italic = italic
-    run.font.color.rgb = color
-    return txb
+    r = p.add_run()
+    r.text = text
+    r.font.size = Pt(size)
+    r.font.bold = bold
+    r.font.italic = italic
+    r.font.color.rgb = color
+    return box
 
+blank = prs.slide_layouts[6]
 
-# ══════════════════════════════════════════════════════════════════
-# SLIDE 1 — Hero / cover
-# ══════════════════════════════════════════════════════════════════
-blank_layout = prs.slide_layouts[6]
-slide1 = prs.slides.add_slide(blank_layout)
+# ════════════════════════════════════════════════════════
+# SLIDE 1 — Couverture
+# ════════════════════════════════════════════════════════
+s1 = prs.slides.add_slide(blank)
 
-# Full background
-bg = add_rect(slide1, 0, 0, 13.33, 7.5, NAVY)
+# Fond
+add_rect(s1, 0, 0, 13.33, 7.5, BG)
 
-# Decorative gold stripe at top
-add_rect(slide1, 0, 0, 13.33, 0.12, GOLD)
-# Decorative gold stripe at bottom
-add_rect(slide1, 0, 7.38, 13.33, 0.12, GOLD)
+# Bloc couleur gauche (teal doux)
+add_rect(s1, 0, 0, 5.4, 7.5, TEAL_LIGHT)
 
-# Left gold vertical accent
-add_rect(slide1, 0, 0.12, 0.08, 7.26, DARK_GOLD)
+# Fine bande teal sur le bord gauche
+add_rect(s1, 0, 0, 0.06, 7.5, TEAL)
 
-# ── Big title ──────────────────────────────────
-# Shadow effect rectangle
-sh = add_rect(slide1, 0.42, 0.88, 7.8, 1.55, RGBColor(0x05, 0x10, 0x25))
-txb = slide1.shapes.add_textbox(Inches(0.4), Inches(0.85), Inches(7.8), Inches(1.6))
-txb.word_wrap = False
-tf = txb.text_frame
+# ── Texte gauche ─────────────────────────────────────
+tb(s1, 0.45, 0.7, 4.6, 0.5, "À VENDRE — OCCASION", 10,
+   bold=True, color=TEAL, italic=False)
+
+# Titre
+box = s1.shapes.add_textbox(Inches(0.45), Inches(1.2), Inches(4.6), Inches(2.4))
+box.word_wrap = True
+tf = box.text_frame
+tf.word_wrap = True
 p = tf.paragraphs[0]
 p.alignment = PP_ALIGN.LEFT
-run = p.add_run()
-run.text = "Château Gonflable"
-run.font.size = Pt(52)
-run.font.bold = True
-run.font.color.rgb = WHITE
+r = p.add_run()
+r.text = "Château\nGonflable"
+r.font.size = Pt(46)
+r.font.bold = True
+r.font.color.rgb = DARK
 
 p2 = tf.add_paragraph()
 p2.alignment = PP_ALIGN.LEFT
-run2 = p2.add_run()
-run2.text = "Pirate"
-run2.font.size = Pt(62)
-run2.font.bold = True
-run2.font.color.rgb = GOLD
+r2 = p2.add_run()
+r2.text = "Pirate"
+r2.font.size = Pt(46)
+r2.font.bold = True
+r2.font.color.rgb = TEAL
 
-# ── Skull & crossbones unicode decoration ──
-add_textbox(slide1, 0.4, 0.3, 2, 0.6, "☠  Occasion — Stock limité  ☠",
-            13, bold=True, color=GOLD, align=PP_ALIGN.LEFT)
+# Sous-titre
+tb(s1, 0.45, 3.75, 4.6, 0.45,
+   "Multiactivités · Toboggan · Escalade · Parcours",
+   12, color=MID, italic=True)
 
-# ── Price badge ────────────────────────────────
-badge = add_rounded_rect(slide1, 0.4, 2.65, 3.4, 1.1, RED)
-add_textbox(slide1, 0.4, 2.68, 3.4, 0.45, "Prix HT", 14, color=WHITE,
-            align=PP_ALIGN.CENTER, bold=False)
-add_textbox(slide1, 0.4, 3.02, 3.4, 0.7, "1 700,00 €", 34, bold=True,
-            color=WHITE, align=PP_ALIGN.CENTER)
+# Séparateur
+add_rect(s1, 0.45, 4.3, 2.0, 0.03, TEAL)
 
-# ── Tagline ────────────────────────────────────
-add_textbox(slide1, 0.4, 3.95, 6, 0.5,
-            "Multiactivités · Toboggan · Escalade · Parcours",
-            15, color=LIGHT_BLUE, align=PP_ALIGN.LEFT, italic=True)
+# Prix
+tb(s1, 0.45, 4.5, 2.5, 0.4, "Prix de vente HT", 10, color=MID)
+tb(s1, 0.45, 4.85, 4.0, 0.75, "1 700,00 €", 38, bold=True, color=CORAL)
 
-# ── Specs quick-view ──────────────────────────
-specs_bg = add_rounded_rect(slide1, 0.4, 4.6, 5.6, 2.55, RGBColor(0x10, 0x2A, 0x5E))
+# Norme
+add_rrect(s1, 0.45, 5.75, 2.0, 0.42, TEAL_LIGHT)
+tb(s1, 0.55, 5.82, 1.9, 0.32, "Conforme EN 14960", 10, bold=True, color=TEAL, align=PP_ALIGN.CENTER)
 
-specs = [
-    ("📐", "Dimensions",  "L 8 m × P 5,1 m × H 4,3 m"),
-    ("⚡", "Alimentation", "220 V / 16 A (prise standard)"),
-    ("👥", "Capacité max", "12 enfants  ou  6 adultes"),
-    ("✅", "Norme",        "Conforme EN 14960"),
-]
-for i, (icon, label, val) in enumerate(specs):
-    y = 4.7 + i * 0.58
-    add_textbox(slide1, 0.55, y, 0.45, 0.48, icon, 18, color=GOLD)
-    add_textbox(slide1, 0.95, y, 1.6,  0.48, label + " :", 13,
-                bold=True, color=GOLD)
-    add_textbox(slide1, 2.55, y, 3.3,  0.48, val, 13, color=WHITE)
+# ── Zone image droite ────────────────────────────────
+add_rect(s1, 5.5, 0, 7.83, 7.5, SAND)
+add_rrect(s1, 6.0, 0.6, 6.9, 6.3, WHITE, adj=0.04)
+tb(s1, 6.0, 3.6, 6.9, 0.5, "[ Image produit ]",
+   16, color=LIGHT_GREY, align=PP_ALIGN.CENTER, italic=True)
 
-# ── Right-side image placeholder (decorative frame) ──
-frame = add_rounded_rect(slide1, 6.5, 0.5, 6.5, 6.6, RGBColor(0x12, 0x2B, 0x5E))
-# Gold border
-border_shapes = [
-    (6.5,  0.5,  6.5,  0.05),   # top
-    (6.5,  7.05, 6.5,  0.05),   # bottom
-    (6.5,  0.5,  0.05, 6.6),    # left
-    (12.95,0.5,  0.05, 6.6),    # right
-]
-for (bl, bt, bw, bh) in border_shapes:
-    add_rect(slide1, bl, bt, bw, bh, GOLD)
-
-add_textbox(slide1, 6.55, 3.3, 6.4, 0.9,
-            "[ Image produit ]",
-            20, color=RGBColor(0x5A, 0x7A, 0xAA),
-            align=PP_ALIGN.CENTER, italic=True)
-
-# ── Source URL (footer) ───────────────────────
-add_textbox(slide1, 0.4, 7.1, 12.5, 0.35,
-            "Source : https://jeux-gonflables.net — Parcours gonflable occasion #1359",
-            9, color=RGBColor(0x88, 0xAA, 0xCC), align=PP_ALIGN.LEFT)
+# Footer
+tb(s1, 0.45, 7.15, 12.5, 0.3,
+   "jeux-gonflables.net — Parcours gonflable occasion #1359",
+   8, color=MID)
 
 
-# ══════════════════════════════════════════════════════════════════
-# SLIDE 2 — Fiche technique détaillée
-# ══════════════════════════════════════════════════════════════════
-slide2 = prs.slides.add_slide(blank_layout)
-bg2 = add_rect(slide2, 0, 0, 13.33, 7.5, NAVY)
-add_rect(slide2, 0, 0, 13.33, 0.12, GOLD)
-add_rect(slide2, 0, 7.38, 13.33, 0.12, GOLD)
-add_rect(slide2, 0, 0.12, 0.08, 7.26, DARK_GOLD)
+# ════════════════════════════════════════════════════════
+# SLIDE 2 — Fiche technique
+# ════════════════════════════════════════════════════════
+s2 = prs.slides.add_slide(blank)
+add_rect(s2, 0, 0, 13.33, 7.5, BG)
+add_rect(s2, 0, 0, 0.06, 7.5, TEAL)
 
-# Header band
-add_rect(slide2, 0.08, 0.12, 13.25, 1.05, RGBColor(0x0E, 0x27, 0x55))
-add_textbox(slide2, 0.3, 0.18, 9, 0.9,
-            "Fiche Technique — Château Gonflable Pirate",
-            30, bold=True, color=GOLD)
-add_textbox(slide2, 10.0, 0.32, 3.0, 0.55,
-            "1 700,00 € HT", 22, bold=True, color=RED,
-            align=PP_ALIGN.RIGHT)
+# Header
+tb(s2, 0.35, 0.32, 10, 0.42, "FICHE TECHNIQUE", 11,
+   bold=True, color=TEAL)
+tb(s2, 0.35, 0.68, 8, 0.6, "Château Gonflable Pirate", 28,
+   bold=True, color=DARK)
+add_rect(s2, 0.35, 1.35, 12.6, 0.03, LIGHT_GREY)
 
-# ── Left column: specs table ──────────────────
-col_specs = [
-    ("Dimensions",    "L 8 m × Profondeur 5,1 m × Hauteur 4,3 m"),
-    ("Alimentation",  "1 prise 220 V / 16 A (standard)"),
-    ("Capacité",      "12 enfants  OU  6 adultes"),
+# ── Colonne gauche : tableau ──────────────────────────
+add_rrect(s2, 0.35, 1.55, 5.9, 5.6, WHITE, adj=0.04)
+tb(s2, 0.65, 1.75, 5.3, 0.4, "Caractéristiques", 13, bold=True, color=DARK)
+add_rect(s2, 0.65, 2.18, 5.3, 0.025, LIGHT_GREY)
+
+rows = [
+    ("Dimensions",    "L 8 m × P 5,1 m × H 4,3 m"),
+    ("Alimentation",  "220 V / 16 A — prise standard"),
+    ("Capacité max",  "12 enfants  ou  6 adultes"),
     ("Certification", "Conforme EN 14960"),
     ("État",          "Occasion — bon état général"),
     ("Livraison",     "À définir selon localisation"),
 ]
+for i, (label, val) in enumerate(rows):
+    y = 2.28 + i * 0.78
+    if i % 2 == 0:
+        add_rrect(s2, 0.37, y, 5.86, 0.72, SAND, adj=0.02)
+    tb(s2, 0.65, y + 0.08, 1.8, 0.3, label, 10, bold=True, color=MID)
+    tb(s2, 0.65, y + 0.35, 5.3, 0.3, val, 12, bold=False, color=DARK)
 
-add_rounded_rect(slide2, 0.3, 1.35, 6.0, 5.75, RGBColor(0x0D, 0x24, 0x52))
-add_textbox(slide2, 0.45, 1.42, 5.7, 0.5,
-            "Caractéristiques techniques", 16, bold=True, color=GOLD)
-
-for i, (label, value) in enumerate(col_specs):
-    y_top = 1.95 + i * 0.88
-    row_bg_color = RGBColor(0x12, 0x2C, 0x5E) if i % 2 == 0 else RGBColor(0x0D, 0x22, 0x4A)
-    add_rect(slide2, 0.32, y_top, 5.96, 0.82, row_bg_color)
-    add_textbox(slide2, 0.45, y_top + 0.05, 1.7, 0.38,
-                label, 12, bold=True, color=GOLD)
-    add_textbox(slide2, 0.45, y_top + 0.38, 5.7, 0.38,
-                value, 12, color=WHITE)
-
-# ── Right column: highlights ──────────────────
-add_rounded_rect(slide2, 6.6, 1.35, 6.45, 5.75, RGBColor(0x0D, 0x24, 0x52))
-add_textbox(slide2, 6.75, 1.42, 6.1, 0.5,
-            "Points forts", 16, bold=True, color=GOLD)
+# ── Colonne droite : points forts ────────────────────
+add_rrect(s2, 6.65, 1.55, 6.33, 5.6, WHITE, adj=0.04)
+tb(s2, 6.95, 1.75, 5.7, 0.4, "Points forts", 13, bold=True, color=DARK)
+add_rect(s2, 6.95, 2.18, 5.7, 0.025, LIGHT_GREY)
 
 highlights = [
-    ("🏴‍☠️", "Thème Pirate immersif",
-     "Décoration pirates ultra-réaliste, idéale pour les anniversaires et événements."),
-    ("🎢", "Multi-activités",
-     "Toboggan, parcours d'obstacles, escalade — plusieurs attractions en un seul module."),
-    ("🔒", "Sécurité certifiée",
-     "Conforme à la norme européenne EN 14960 pour les structures gonflables."),
-    ("⚡", "Installation facile",
-     "Branchement sur prise 220V standard, gonflage rapide inclus."),
+    (TEAL_LIGHT,  TEAL,  "Thème immersif",
+     "Décoration pirate ultra-réaliste, idéale\npour anniversaires et événements."),
+    (CORAL_LIGHT, CORAL, "Multi-activités",
+     "Toboggan, escalade, parcours d'obstacles —\nplusieurs jeux en un seul module."),
+    (TEAL_LIGHT,  TEAL,  "Sécurité certifiée",
+     "Norme EN 14960 — garantit la sécurité\ndes utilisateurs enfants et adultes."),
+    (CORAL_LIGHT, CORAL, "Installation simple",
+     "Prise 220 V standard, gonflage rapide,\nprêt à l'emploi en quelques minutes."),
 ]
-
-for i, (icon, title, desc) in enumerate(highlights):
-    y = 2.0 + i * 1.3
-    icon_bg = add_rounded_rect(slide2, 6.75, y, 0.55, 0.55, DARK_GOLD)
-    add_textbox(slide2, 6.75, y + 0.02, 0.55, 0.5,
-                icon, 20, align=PP_ALIGN.CENTER)
-    add_textbox(slide2, 7.4, y, 5.5, 0.45,
-                title, 14, bold=True, color=GOLD)
-    add_textbox(slide2, 7.4, y + 0.42, 5.5, 0.78,
-                desc, 11, color=LIGHT_BLUE, wrap=True)
+for i, (bg_c, dot_c, title, desc) in enumerate(highlights):
+    y = 2.28 + i * 1.3
+    add_rrect(s2, 6.67, y, 6.29, 1.18, bg_c, adj=0.04)
+    add_rrect(s2, 6.85, y + 0.32, 0.18, 0.18, dot_c, adj=0.5)
+    tb(s2, 7.15, y + 0.1, 5.6, 0.38, title, 13, bold=True, color=DARK)
+    tb(s2, 7.15, y + 0.46, 5.6, 0.65, desc, 11, color=MID, wrap=True)
 
 # Footer
-add_textbox(slide2, 0.3, 7.1, 12.5, 0.35,
-            "Source : https://jeux-gonflables.net — Parcours gonflable occasion #1359",
-            9, color=RGBColor(0x88, 0xAA, 0xCC))
+tb(s2, 0.35, 7.15, 12.5, 0.3,
+   "jeux-gonflables.net — Parcours gonflable occasion #1359", 8, color=MID)
 
 
-# ══════════════════════════════════════════════════════════════════
-# SLIDE 3 — Pourquoi choisir / Call to action
-# ══════════════════════════════════════════════════════════════════
-slide3 = prs.slides.add_slide(blank_layout)
-bg3 = add_rect(slide3, 0, 0, 13.33, 7.5, NAVY)
-add_rect(slide3, 0, 0, 13.33, 0.12, GOLD)
-add_rect(slide3, 0, 7.38, 13.33, 0.12, GOLD)
-add_rect(slide3, 0, 0.12, 0.08, 7.26, DARK_GOLD)
+# ════════════════════════════════════════════════════════
+# SLIDE 3 — Arguments & contact
+# ════════════════════════════════════════════════════════
+s3 = prs.slides.add_slide(blank)
+add_rect(s3, 0, 0, 13.33, 7.5, BG)
+add_rect(s3, 0, 0, 0.06, 7.5, TEAL)
 
-# Header
-add_rect(slide3, 0.08, 0.12, 13.25, 1.05, RGBColor(0x0E, 0x27, 0x55))
-add_textbox(slide3, 0.3, 0.18, 12, 0.9,
-            "Pourquoi choisir ce château gonflable ?",
-            30, bold=True, color=GOLD)
+tb(s3, 0.35, 0.32, 10, 0.42, "POURQUOI CHOISIR CE PRODUIT ?", 11,
+   bold=True, color=TEAL)
+tb(s3, 0.35, 0.68, 10, 0.6, "4 bonnes raisons", 28, bold=True, color=DARK)
+add_rect(s3, 0.35, 1.35, 12.6, 0.03, LIGHT_GREY)
 
-# Cards
 cards = [
-    ("💰", "Prix compétitif",
-     "1 700 € HT seulement pour\nune structure multiactivités\nde grande dimension."),
-    ("📐", "Grande superficie",
-     "8 × 5,1 × 4,3 m offrent\nun espace de jeu généreux\npour les enfants."),
-    ("🎉", "Polyvalent",
-     "Parfait pour locations,\nanimations événementielles,\ncentres de loisirs."),
-    ("🛡️", "Normes européennes",
-     "Certification EN 14960\ngarantit la sécurité\nde tous les utilisateurs."),
+    (TEAL,  TEAL_LIGHT,  "Prix compétitif",
+     "1 700 € HT pour une structure\nde grande dimension avec\nplusieurs activités intégrées."),
+    (CORAL, CORAL_LIGHT, "Grande superficie",
+     "8 × 5,1 × 4,3 m — un espace\nde jeu généreux adapté\naux enfants comme aux adultes."),
+    (TEAL,  TEAL_LIGHT,  "Très polyvalent",
+     "Idéal pour la location,\nles animations événementielles\net les centres de loisirs."),
+    (CORAL, CORAL_LIGHT, "Normes européennes",
+     "Certification EN 14960\npour une utilisation\nen toute sérénité."),
 ]
 
-for i, (icon, title, desc) in enumerate(cards):
+for i, (accent, bg_c, title, desc) in enumerate(cards):
     col = i % 2
     row = i // 2
-    l = 0.55 + col * 6.45
-    t = 1.45 + row * 2.85
-    card = add_rounded_rect(slide3, l, t, 6.1, 2.6, RGBColor(0x0E, 0x27, 0x55))
-    # top accent
-    add_rect(slide3, l, t, 6.1, 0.06, GOLD)
-    add_textbox(slide3, l + 0.25, t + 0.15, 0.7, 0.7, icon, 32)
-    add_textbox(slide3, l + 1.05, t + 0.18, 4.8, 0.55,
-                title, 18, bold=True, color=GOLD)
-    add_textbox(slide3, l + 0.25, t + 0.85, 5.6, 1.6,
-                desc, 13, color=LIGHT_BLUE, wrap=True)
+    l = 0.35 + col * 6.52
+    t = 1.55 + row * 2.78
+    add_rrect(s3, l, t, 6.15, 2.55, WHITE, adj=0.04)
+    add_rect(s3, l, t, 6.15, 0.05, accent)
+    add_rrect(s3, l + 0.25, t + 0.22, 0.45, 0.45, bg_c, adj=0.5)
+    tb(s3, l + 0.25 + 0.14, t + 0.29, 0.2, 0.3, "●", 10, color=accent, align=PP_ALIGN.CENTER)
+    tb(s3, l + 0.85, t + 0.2, 5.1, 0.42, title, 15, bold=True, color=DARK)
+    tb(s3, l + 0.25, t + 0.82, 5.7, 1.55, desc, 12, color=MID, wrap=True)
 
-# CTA banner
-add_rounded_rect(slide3, 2.5, 7.0, 8.33, 0.35, RED)  # thin – just decorative
-add_textbox(slide3, 0.3, 7.08, 12.6, 0.35,
-            "Contactez-nous pour plus d'informations · jeux-gonflables.net",
-            11, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+# Bandeau contact
+add_rrect(s3, 0.35, 7.0, 12.6, 0.38, TEAL_LIGHT, adj=0.08)
+tb(s3, 0.35, 7.06, 12.6, 0.3,
+   "Pour plus d'informations : jeux-gonflables.net — Parcours gonflable occasion #1359",
+   11, color=TEAL, align=PP_ALIGN.CENTER)
 
 
-# ══════════════════════════════════════════════════════════════════
 out = "/home/user/fiestalok/chateau_gonflable_pirate.pptx"
 prs.save(out)
-print(f"Saved → {out}")
+print(f"Saved -> {out}")
