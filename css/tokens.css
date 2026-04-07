@@ -1,0 +1,47 @@
+:root {
+  /* Colors */
+  --color-bg: #F8F9FA;
+  --color-text: #2D3436;
+  --color-text-light: #666666;
+  --color-text-muted: #999999;
+  --color-primary: #4ECDC4;
+  --color-accent: #FFE66D;
+  --color-secondary: #44CF6C;
+  --color-alert: #FF6B6B;
+  --color-white: #FFFFFF;
+
+  /* Typography */
+  --font-display: 'Bangers', 'Impact', cursive;
+  --font-body: 'Nunito', 'Quicksand', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 3rem;
+  --font-size-hero: clamp(2.5rem, 5vw, 4rem);
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 5rem;
+  --space-section: 6rem;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-button: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --container-max: 1200px;
+  --container-padding: 1.5rem;
+}
