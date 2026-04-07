@@ -121,3 +121,45 @@
   color: var(--color-text-light);
   font-weight: 600;
 }
+
+/* ===================== HOW IT WORKS ===================== */
+.steps {
+  background: var(--color-white);
+}
+
+.steps__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.step__icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--space-sm);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.step__number {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.step__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  letter-spacing: 1px;
+  margin-bottom: var(--space-xs);
+}
+
+.step__text {
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+}
