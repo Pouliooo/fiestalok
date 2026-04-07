@@ -263,5 +263,75 @@
       </div>
     </div>
   </section>
+
+  <section class="section" id="contact">
+    <div class="container">
+      <h2 class="section-title">RÉSERVE TA FIESTA</h2>
+      <p class="section-subtitle">Dis-nous tout, on te répond en moins d'1h 🚀</p>
+      <div class="contact__inner">
+
+        <div class="contact__info">
+          <h3 class="contact__info-title">ON EST LÀ POUR TOI</h3>
+          <p class="contact__info-text">
+            Une question ? Une envie de fête ? Remplis le formulaire ou
+            contacte-nous directement. On adore parler fiesta !
+          </p>
+          <div class="contact__detail">
+            <span class="contact__detail-icon">📞</span>
+            <span>06 XX XX XX XX</span>
+          </div>
+          <div class="contact__detail">
+            <span class="contact__detail-icon">✉️</span>
+            <span>hello@fiestalok.fr</span>
+          </div>
+          <div class="contact__detail">
+            <span class="contact__detail-icon">📍</span>
+            <span>Région parisienne & alentours</span>
+          </div>
+          <div class="contact__detail">
+            <span class="contact__detail-icon">🕐</span>
+            <span>Lun-Sam : 9h-19h</span>
+          </div>
+        </div>
+
+        <form class="contact__form" id="contact-form">
+          <div class="form__group">
+            <label class="form__label" for="name">Ton prénom *</label>
+            <input class="form__input" type="text" id="name" name="name" placeholder="Comment tu t'appelles ?" required>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="email">Ton email *</label>
+            <input class="form__input" type="email" id="email" name="email" placeholder="Pour qu'on te réponde !" required>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="phone">Ton téléphone</label>
+            <input class="form__input" type="tel" id="phone" name="phone" placeholder="Si tu préfères qu'on t'appelle">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="event-type">Type d'événement *</label>
+            <select class="form__select" id="event-type" name="event-type" required>
+              <option value="">Choisis ton type de fête</option>
+              <option value="anniversaire">🎂 Anniversaire</option>
+              <option value="evjf">🥂 EVJF / EVG</option>
+              <option value="teambuilding">💼 Team building</option>
+              <option value="corporate">🏢 Événement corporate</option>
+              <option value="kermesse">🎪 Kermesse / Fête de village</option>
+              <option value="autre">🎉 Autre</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="date">Date souhaitée *</label>
+            <input class="form__input" type="date" id="date" name="date" required>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="message">Dis-nous tout !</label>
+            <textarea class="form__textarea" id="message" name="message" placeholder="Nombre d'invités, lieu, envies particulières..."></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary" style="width: 100%;">ENVOYER MA DEMANDE 🎉</button>
+        </form>
+
+      </div>
+    </div>
+  </section>
 </body>
 </html>
