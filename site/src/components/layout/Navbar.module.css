@@ -34,3 +34,21 @@
   border-radius: var(--radius-pill);
   padding: 0.05rem 0.5rem; font-size: 0.75rem;
 }
+
+.actions { display: flex; align-items: center; gap: var(--space-sm); }
+.burger { display: none; font-size: 1.4rem; }
+
+@media (max-width: 768px) {
+  .burger { display: block; }
+  .nav {
+    position: absolute; top: var(--navbar-height); left: 0; right: 0;
+    background: var(--color-bg-alt);
+    flex-direction: column;
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    transform: translateY(-110%);
+    transition: transform 0.25s ease;
+  }
+  .navOpen { transform: translateY(0); }
+  .cartLabel { display: none; }
+}

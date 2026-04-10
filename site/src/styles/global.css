@@ -32,3 +32,5 @@ h3 { font-size: 1.5rem; }
   background-size: 280px 280px;
   background-repeat: repeat;
 }
+
+html, body { overflow-x: hidden; }
