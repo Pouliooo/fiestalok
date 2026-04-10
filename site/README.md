@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# Fiestalo'K — Site v2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Version multi-pages du site Fiestalo'K, basée sur Vite + React + React Router.
+La v1 vanilla reste disponible à la racine du repo (`../index.html`).
 
-Currently, two official plugins are available:
+## Lancer le site
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd site
+npm install
+npm run dev      # http://localhost:5174
+npm run build    # build de production dans site/dist
+npx vitest run   # lance la suite de tests
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `src/pages/` — une page par route (`HomePage`, `CataloguePage`, `ProductPage`, `EntreprisePage`, `QuiSommesNousPage`)
+- `src/components/`
+  - `layout/` — `Navbar`, `Footer`, `CartDrawer` (rendus par `App.tsx` autour de `<Routes>`)
+  - `ui/` — `Button`, `Badge`, `Section`, `StarRating` (primitives réutilisables)
+  - `product/` — `ProductCard`, `ProductGallery`, `AvailabilityCalendar`, `ReviewList`, `ReviewForm`
+  - `catalogue/` — `CategoryTabs`, `CatalogueFilters`
+- `src/context/` — `CartContext` et `ReviewsContext` (persistés en `localStorage`)
+- `src/data/` — `products.json`, `categories.ts`, `unavailable.ts`, `types.ts`
+- `src/lib/` — helpers purs (`filterProducts`, `format`, `storage`)
+- `src/styles/` — `tokens.css` (variables CSS Pop Décalé), `reset.css`, `global.css`
+- `src/tests/` — Vitest + React Testing Library (`CartContext`, `CatalogueFilters`, `AvailabilityCalendar`)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Direction artistique
+
+"Pop Décalé" — palette turquoise / corail / jaune / charbon, typo Bangers + Nunito, badges stickers rotatés.
+Voir `../docs/superpowers/specs/2026-04-07-moodboard-direction-artistique-design.md` pour la spec complète et `../moodboard.html` pour l'aperçu.
+
+## Routes
+
+| Route | Page | Description |
+|---|---|---|
+| `/` | `HomePage` | Hero, comment ça marche, catégories, produits stars, valeurs |
+| `/catalogue` | `CataloguePage` | Tabs catégories, filtres, tri, grille produits |
+| `/produit/:id` | `ProductPage` | Galerie, specs, calendrier dispos, avis |
+| `/entreprise` | `EntreprisePage` | Hero corporate, références, formules, gallery, conformité |
+| `/qui-sommes-nous` | `QuiSommesNousPage` | Histoire, valeurs, stats |
+
+## Données
+
+Tout est local. Pas de backend.
+- 15 produits dans `src/data/products.json` (images Unsplash).
+- Indisponibilités mockées dans `src/data/unavailable.ts` pour les produits 1-3.
+- Le panier et les avis sont persistés en `localStorage` via `CartContext` / `ReviewsContext`.
