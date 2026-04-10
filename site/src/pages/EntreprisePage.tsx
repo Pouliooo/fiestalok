@@ -27,12 +27,12 @@ const FORMULES = [
 ];
 
 const EVENTS = [
-  'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600',
-  'https://images.unsplash.com/photo-1530023367847-a683933f4172?w=600',
-  'https://images.unsplash.com/photo-1543007631-283050bb3e8c?w=600',
-  'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600',
-  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600',
-  'https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=600',
+  'https://picsum.photos/seed/fiestalok-corp-1/600/450',
+  'https://picsum.photos/seed/fiestalok-corp-2/600/450',
+  'https://picsum.photos/seed/fiestalok-corp-3/600/450',
+  'https://picsum.photos/seed/fiestalok-corp-4/600/450',
+  'https://picsum.photos/seed/fiestalok-corp-5/600/450',
+  'https://picsum.photos/seed/fiestalok-corp-6/600/450',
 ];
 
 const COMPLIANCE = [
@@ -100,7 +100,7 @@ export function EntreprisePage() {
         <div className={styles.gallery}>
           {EVENTS.map((src) => (
             <div key={src} className={styles.galleryItem}>
-              <img src={src} alt="" loading="lazy" />
+              <img src={src} alt="" />
             </div>
           ))}
         </div>
