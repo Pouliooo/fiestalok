@@ -34,3 +34,9 @@ h3 { font-size: 1.5rem; }
 }
 
 html, body { overflow-x: hidden; }
+
+html.snap-page { scroll-snap-type: y mandatory; }
+html.snap-page section {
+  scroll-snap-align: start;
+  scroll-margin-top: var(--navbar-height);
+}
